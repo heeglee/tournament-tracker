@@ -20,7 +20,6 @@ namespace TrackerLibrary
         #endregion
 
         #region ######### PROPERTIES
-        //public static List<IDataConnection> Connections { get; private set; } = new List<IDataConnection>();
         public static IDataConnection Connection { get; private set; }
         #endregion
 

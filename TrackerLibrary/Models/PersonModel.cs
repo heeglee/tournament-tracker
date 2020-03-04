@@ -15,14 +15,10 @@ namespace TrackerLibrary.Models
 
         public string PersonTitle
         {
-            get { return $"{ Name } ({ EmailAddress })"; }
+            get { return Name; }
         }
 
-
-        public PersonModel()
-        {
-
-        }
+        public PersonModel() {}
 
         public PersonModel(string name, string emailAddress, string phoneNumber)
         {

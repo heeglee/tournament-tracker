@@ -51,13 +51,13 @@ namespace TrackerUI
                 emailValue.Text = "";
                 phoneValue.Text = "";
 
-                // TODO: think this is not a safe and confident way
+                // TODO: think this is not a safe and confidential way
                 availableTeamMembers.Add(model);
                 WireUpLists();
             }
             else
             {
-                MessageBox.Show("You need to fill in all of the fields.");
+                MessageBox.Show("모든 필드를 입력해야 합니다.");
             }
         }
 
@@ -104,10 +104,10 @@ namespace TrackerUI
             model.TeamName = teamNameValue.Text;
             model.TeamMembers = selectedTeamMembers;
 
-            model = GlobalConfig.Connection.CreateTeam(model);
+            GlobalConfig.Connection.CreateTeam(model);
             callingForm.TeamComplete(model);
 
-            MessageBox.Show("Successfully created the team.");
+            MessageBox.Show("팀 생성 완료.");
             this.Close();
         }
     }

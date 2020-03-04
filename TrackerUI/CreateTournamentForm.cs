@@ -14,14 +14,18 @@ namespace TrackerUI
 {
     public partial class CreateTournamentForm : Form, IPrizeRequester, ITeamRequester
     {
+        ITournamentRequester callingForm;
+
         List<TeamModel> availableTeams = GlobalConfig.Connection.GetTeam_All();
         List<TeamModel> selectedTeams = new List<TeamModel>();
         List<PrizeModel> selectedPrizes = new List<PrizeModel>();
 
-        public CreateTournamentForm()
+        public CreateTournamentForm(ITournamentRequester caller)
         {
             InitializeComponent();
             WireUpLists();
+
+            callingForm = caller;
         }
 
         private void WireUpLists()
@@ -55,7 +59,6 @@ namespace TrackerUI
 
         private void createPrizeButton_Click(object sender, EventArgs e)
         {
-            // Call the CreatePrizeForm
             CreatePrizeForm form = new CreatePrizeForm(this);
             form.ShowDialog();
         }
@@ -97,7 +100,6 @@ namespace TrackerUI
 
             if (prize != null)
             {
-                // TODO: Wire prizesListBox w/ DB
                 selectedPrizes.Remove(prize);
                 WireUpLists();
             }
@@ -107,14 +109,12 @@ namespace TrackerUI
         {
             decimal entryFee = 0;
 
-            // CHK: entryFee out
             if (!decimal.TryParse(entryFeeValue.Text, out entryFee))
             {
-                MessageBox.Show("You need to enter a valid entry fee value.");
+                MessageBox.Show("참가비에 올바른 값을 입력해야 합니다.");
                 return;
             }
 
-            // Create our tournament model
             TournamentModel tournament = new TournamentModel();
 
             tournament.TournamentName = tournamentNameValue.Text;
@@ -122,15 +122,12 @@ namespace TrackerUI
             tournament.TournamentPrizes = selectedPrizes;
             tournament.EnteredTeams = selectedTeams;
 
-            // TODO: Wire our matchups
             TournamentLogic.CreateRounds(tournament);
-            
-            // Create Tournament Entry
-            // Create all of the prizes entries
-            // Create all of team entries
             GlobalConfig.Connection.CreateTournament(tournament);
 
-            // Create our matchups
+            callingForm.TournamentComplete(tournament);
+            MessageBox.Show("토너먼트 생성 완료.");
+            this.Close();
         }
     }
 }

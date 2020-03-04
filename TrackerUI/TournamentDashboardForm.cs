@@ -12,9 +12,9 @@ using TrackerLibrary.Models;
 
 namespace TrackerUI
 {
-    public partial class TournamentDashboardForm : Form
+    public partial class TournamentDashboardForm : Form, ITournamentRequester
     {
-        List<TournamentModel> tournaments = GlobalConfig.Connection.GetTournament_All();
+        List<TournamentModel> tournaments;
 
         public TournamentDashboardForm()
         {
@@ -24,13 +24,14 @@ namespace TrackerUI
 
         private void WireUpLists()
         {
+            tournaments = GlobalConfig.Connection.GetTournament_All();
             loadExistingTournamentDropDown.DataSource = tournaments;
             loadExistingTournamentDropDown.DisplayMember = "TournamentName";
         }
 
         private void createTournamentButton_Click(object sender, EventArgs e)
         {
-            CreateTournamentForm frm = new CreateTournamentForm();
+            CreateTournamentForm frm = new CreateTournamentForm(this);
             frm.ShowDialog();
         }
 
@@ -40,6 +41,11 @@ namespace TrackerUI
             TournamentViewerForm frm = new TournamentViewerForm(tm);
 
             frm.ShowDialog();
+        }
+
+        public void TournamentComplete(TournamentModel model)
+        {
+            WireUpLists();
         }
     }
 }

@@ -126,12 +126,12 @@ namespace TrackerUI
                         teamOneName.Text = m.Entries[0].TeamCompeting.TeamName;
                         teamOneScoreValue.Text = m.Entries[0].Score.ToString();
 
-                        teamTwoName.Text = "<bye>";
+                        teamTwoName.Text = "<부전승>";
                         teamTwoScoreValue.Text = "0";
                     }
                     else
                     {
-                        teamOneName.Text = "Not Yet Set";
+                        teamOneName.Text = "미정";
                         teamOneScoreValue.Text = "";
                     }
                 }
@@ -145,7 +145,7 @@ namespace TrackerUI
                     }
                     else
                     {
-                        teamTwoName.Text = "Not Yet Set";
+                        teamTwoName.Text = "미정";
                         teamTwoScoreValue.Text = "";
                     }
                 }
@@ -162,22 +162,29 @@ namespace TrackerUI
             LoadMatchups();
         }
 
+        private bool isScoreValid(out double teamOneScore, out double teamTwoScore)
+        {
+            // TODO: make a separated error message for each case.
+            bool output = true;
+            bool scoreOneValid = double.TryParse(teamOneScoreValue.Text, out teamOneScore);
+            bool scoreTwoValid = double.TryParse(teamTwoScoreValue.Text, out teamTwoScore);
+
+            if (!scoreOneValid || !scoreTwoValid || (teamOneScore == 0 && teamTwoScore == 0) || teamOneScore == teamTwoScore)
+            {
+                output = false;
+            }
+
+            return output;
+        }
+
         private void scoreButton_Click(object sender, EventArgs e)
         {
             MatchupModel m = (MatchupModel)matchupListBox.SelectedItem;
+            double teamOneScore, teamTwoScore;
 
-            double teamOneScore = 0;
-            double teamTwoScore = 0;
-
-            if (!double.TryParse(teamOneScoreValue.Text, out teamOneScore) || !double.TryParse(teamTwoScoreValue.Text, out teamTwoScore))
+            if (!isScoreValid(out teamOneScore, out teamTwoScore))
             {
-                MessageBox.Show("Please enter a valid score value.");
-                return;
-            }
-
-            if (teamOneScore == teamTwoScore)
-            {
-                MessageBox.Show("Matchup must have a winner team.");
+                MessageBox.Show("올바른 점수값을 입력해야 합니다.");
                 return;
             }
 
@@ -199,37 +206,17 @@ namespace TrackerUI
                     }
                 }
             }
-
-            if (teamOneScore > teamTwoScore)
+            try
             {
-                // team one wins
-                m.Winner = m.Entries[0].TeamCompeting;
+                TournamentLogic.UpdateTournamentResults(tournament);
             }
-            else if (teamTwoScore > teamOneScore)
+            catch (Exception ex)
             {
-                // team two wins
-                m.Winner = m.Entries[1].TeamCompeting;
+                MessageBox.Show(ex.Message);
+                return;
             }
 
-            foreach (List<MatchupModel> round in tournament.TournamentRounds)
-            {
-                foreach (MatchupModel rm in round)
-                {
-                    foreach (MatchupEntryModel rme in rm.Entries)
-                    {
-                        if (rme.ParentMatchup != null && rme.ParentMatchup.Id == m.Id)
-                        {
-                            rme.TeamCompeting = m.Winner;
-                            GlobalConfig.Connection.UpdateMatchup(rm);
-                        }
-                    }
-                }
-            }
-
-            GlobalConfig.Connection.UpdateMatchup(m);
             LoadMatchups();
-
-            
         }
     }
 }

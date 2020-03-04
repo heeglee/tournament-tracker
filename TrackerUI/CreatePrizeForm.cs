@@ -32,12 +32,12 @@ namespace TrackerUI
                 GlobalConfig.Connection.CreatePrize(model);
                 callingForm.PrizeComplete(model);
 
-                MessageBox.Show("Successfully created the prize.");
+                MessageBox.Show("상 생성 완료.");
                 this.Close();
             }
             else
             {
-                MessageBox.Show("This form has invalid information. Please check it and try again.");
+                MessageBox.Show("입력값이 잘못되었습니다.");
             }
         }
 
